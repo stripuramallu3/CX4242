@@ -1,0 +1,6 @@
+Line 16: Isolate the line into three tokens based on tab
+Line 18: Filters out all weights that are -1
+Line 20: Obtains all of the negative weights for each source/weight pair
+Line 22: Obtains all of the postive weights for each target/weight pair
+Line 24: Computes the union between the negative-source values and the positive-target values to union the two sets
+Lines 26-27: The reduce by key function eliminates all duplicates, and then the sum of the dataset is taken to calculate the gross accumulated node weight

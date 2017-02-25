@@ -1,0 +1,7 @@
+data = LOAD 's3://cse6242-2016fall-bigrams-big/*' AS (txt:chararray, year:int, numOcc:float, numBooks:float);
+data = FILTER data BY numOcc >= 50;
+data = GROUP data BY txt;
+third = FOREACH data GENERATE group AS txt, SUM(data.numOcc)/SUM(data.numBooks) AS average;
+fourth = ORDER third BY average desc, txt asc;
+fifth =  LIMIT fourth 10;
+store fifth into 's3://cse6242-stripuramallu3/output-big/';
