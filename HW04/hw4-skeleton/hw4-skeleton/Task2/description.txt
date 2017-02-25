@@ -1,0 +1,4 @@
+I used multi-way split and entropy to create the various decision tree. Although Gini is preferred for continuous attributes, I used entropy because the difference is very small. Also, implemented multi-way split because it is better than binary split as each attribute rarely appears more than once in any path from the root to leaf. I split until the max-depth of 17 is reached. 
+
+Out-of-Bag Error: 1 - accuaracy = 1 - 0.8568 = 0.1432
+

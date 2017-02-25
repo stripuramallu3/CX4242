@@ -1,0 +1,25 @@
+Section A
+
+1.  weka.classifiers.trees.RandomForest -I 10 -K 12 -S 1 -depth 17
+    Time taken to build model: 0.60 seconds
+    Overall accuracy: 85.30 %
+    Confusion Matrix:
+    False(0)    True(1)
+    2713        546     False(0)
+    734         144     True(1)
+
+2.  weka.classifiers.rules.DecisionTable -X 1 -S "weka.attributeSelection.BestFirst -D 1 -N 5"
+    Time taken to build model: 0.28 seconds
+    Overall accuracy: 80.92 %
+    Confusion Matrix:
+    False(0)    True(1)
+    2581        596     False(0)
+    657         199     True(1)
+
+Section B
+
+1. The result of Weka is 85.30% compared to my result of 85.68%. This could be due to a slightly different bootstrapping, however the difference is quite small, thus I beleive the difference is neglibable. 
+
+2. I chose a decision table. The decision table is slightly less accuarate than the RandomForest but nearly twice as fast.
+As a result, I tuned the number of trees parameter so in order to run faster but retain the accuaracy of the RandomForest.  
+
