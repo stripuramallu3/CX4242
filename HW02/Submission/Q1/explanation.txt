@@ -1,0 +1,7 @@
+Q1.a:
+There are four columns removed from the orignial data set because they did not contain any information (empty columns).
+Numerical columns (except year) are right alligned to allow the least significant digits to align. Year is left alligned because the year is alwways a four digit number.
+
+
+Q1.b:
+I used a bar chart to visualize the data provided because it cleanly displays the information; as it seperates the data by age, sex, and country of origin. Also, I organized the data in decending order with the females ages 18-59 as the parameter because this was one of the larger statistic for most countries. In turn, this would help idenifty which countries had the greatest number of refugees. Lastly, I removed Russian Federation from the chart because their numbers were exceptionally small, thus it looked like their values were 0 for all demographics.

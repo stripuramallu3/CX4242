@@ -1,0 +1,3 @@
+The petal width vs petal length is the best plot because the various species are isolated in differrent portions of the graph. 
+
+Log scaling can be useful in charts, such as scatterplots if the data set contains a large range. When such a large range exits log scaling can be useful to convert the large range to a smaller range. 

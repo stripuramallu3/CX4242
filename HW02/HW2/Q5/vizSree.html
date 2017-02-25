@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Sankey</title>
+<script src="..//lib/d3.v3.min.js"></script>
+<script src="..//lib/sankey.js"></script>
+<style>
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+
+.link:hover {
+  stroke-opacity: .5;
+}
+
+</style>
+<body>
+<script>
+var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    width = 700 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+// append the svg canvas to the page
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  	.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// Set the sankey diagram properties
+var sankey = d3.sankey()
+    .nodeWidth(36)
+    .nodePadding(40)
+    .size([width, height]);
+
+var path = sankey.link();
+var graph = {"nodes" : [], "links" : []};
+d3.csv("races.csv", function(error, data1) {
+  d3.csv("teams.csv", function(error, data2) {
+    var nodeIDs = {};
+    var count = 0;
+    data1.forEach(function (d) {
+      if (nodeIDs[d.race] === undefined) {
+        nodeIDs[d.race] = count++;
+        graph.nodes.push({"node": count, "name": d.race});
+      }
+      if (nodeIDs[d.driver] === undefined) {
+        nodeIDs[d.driver] = count++;
+        graph.nodes.push({"node": count, "name": d.driver});
+      }
+      graph.links.push({"source": nodeIDs[d.race], "target": nodeIDs[d.driver], "points": +d.points});
+    });
+    data2.forEach(function (d) {
+      if (nodeIDs[d.team] === undefined) {
+        nodeIDs[d.team] = count++;
+        graph.nodes.push({"node": count, "name": d.team});
+      }
+      graph.links.push({"source": nodeIDs[d.driver], "target": nodeIDs[d.team], "points": +d.points});
+    });
+    console.log(graph.nodes);
+    console.log(graph.links);
+
+
+  sankey.nodes(graph.nodes).links(graph.links).layout(32);
+
+  var link = svg.append("g").selectAll(".link")
+      .data(graph.links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; });
+
+// add the link titles
+  link.append("title")
+        .text(function(d) {
+        return d.source.name + " → " +
+                d.target.name + "\n" + d.points; });
+
+// add in the nodes
+  var node = svg.append("g").selectAll(".node")
+      .data(graph.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")"; });
+
+
+// add the rectangles for the nodes
+  node.append("rect")
+      .attr("height", function(d) { return d.dy; })
+      .attr("width", sankey.nodeWidth())
+    //   .style("fill", function(d) {
+    //   return d.color = color(d.name.replace(/ .*/, "")); })
+      .style("stroke", function(d) {
+      return d3.rgb(d.color).darker(2); })
+    .append("title")
+      .text(function(d) {
+      return d.name + "\n" + d.points; });
+
+// add in the title for the nodes
+  node.append("text")
+      .attr("x", -6)
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+    .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+  })
+})
+
+</script>

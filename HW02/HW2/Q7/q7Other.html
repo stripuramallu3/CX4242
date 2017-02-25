@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../lib/d3.v3.min.js"></script>
+<style type="text/css">
+
+/* On mouse hover, lighten state color */
+path:hover {
+	fill-opacity: .7;
+}
+
+.axis--x path {
+  display: none;
+}
+
+.bar:hover {
+  fill: "steelblue";
+}
+        
+/* Legend Font Style */
+body {
+	font: 11px sans-serif;
+}
+        
+/* Legend Position Style */
+.legend {
+	position:absolute;
+	left:800px;
+	top:350px;
+}
+
+</style>
+</head>
+<body>
+<script src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript">
+var axisMargin = 20,
+    margin = 90, 
+    width = 1024, 
+    height = 500, 
+    scale = 0; 
+
+var svg = d3.select("body").append("svg")
+            .attr('width', width)
+            .attr("height", height); 
+/*svg.append("text")
+   .attr("x", (width/2))
+   .attr("y", (height - 100))
+   .attr("text-anchor", "middle")
+   .style("font-size" "20px")
+   .text("SAT Scores vs Cost of Attendance"); */
+
+var x = d3.scale.linear().range([0, width]); 
+var y = d3.scale.linear().range([height, 0]); 
+
+d3.csv("Most+Recent+Cohorts+(Scorecard+Elements).csv", function(error, data) {
+  if (error) throw error; 
+  var    barHeight = (height - axisMargin - margin*2)*0.4/data.length; 
+  var    barPadding = (height - axisMargin - margin*2)*0.6/data.length; 
+  x.domain(d3.extent(data, function(d) {
+    return d.COSTT4_A; 
+  })).nice(); 
+  y.domain(d3.extent(data, function(d) {
+    return d.ACTCM_75; 
+  }))
+var bar = svg.selectAll("g")
+            .data(data)
+            .enter().append("g")
+bar.attr("class", "bar")
+   .attr("cx", 0)
+   .attr("transform", function(d, i) {
+        return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
+    });
+
+var rectangle = bar.append("rect")
+                   .style("grey")
+                       //.attr("transform", "translate("+ 50 +", 0)")
+                  .attr("height", function(d) { return d.ACTCM_75; })
+                  .attr("width", 20); 
+
+
+
+})
+
+
+
+
+</script>
+</body>
+</html>

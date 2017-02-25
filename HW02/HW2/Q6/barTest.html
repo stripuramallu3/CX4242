@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html charset="utf-8">
+
+<head>
+<title>Cars comparison</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+</head>
+
+<body>
+
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+    <script src="../lib/d3.v3.min.js"></script>
+
+<!-- data for the 5 sportscars that will be presented -->
+<script type="text/javascript">
+var data_from_json = [
+	{
+	"Vehicle Name":"Porsche 911 Carrera 4S coupe 2dr (convert)",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":1,
+	"RWD":0,
+	"Retail Price":84165,
+	"Dealer Cost":72206,
+	"Engine Size (l)":3.6,
+	"Cyl":6,
+	"HP":315,
+	"City MPG":17,
+	"Hwy MPG":24,
+	"Weight":3240,
+	"Wheel Base":93,
+	"Len":175,
+	"Width":72
+	},
+	{
+	"Vehicle Name":"Porsche 911 Carrera convertible 2dr (coupe)",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":79165,
+	"Dealer Cost":69229,
+	"Engine Size (l)":3.6,
+	"Cyl":6,
+	"HP":315,
+	"City MPG":18,
+	"Hwy MPG":26,
+	"Weight":3135,
+	"Wheel Base":93,
+	"Len":175,
+	"Width":70
+	},
+	{
+	"Vehicle Name":"Mercedes-Benz SL600 convertible 2dr",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":126670,
+	"Dealer Cost":117854,
+	"Engine Size (l)":5.5,
+	"Cyl":12,
+	"HP":493,
+	"City MPG":13,
+	"Hwy MPG":19,
+	"Weight":4429,
+	"Wheel Base":101,
+	"Len":179,
+	"Width":72
+	},
+	{
+	"Vehicle Name":"Mercedes-Benz SLK230 convertible 2dr",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":40320,
+	"Dealer Cost":37548,
+	"Engine Size (l)":2.3,
+	"Cyl":4,
+	"HP":192,
+	"City MPG":21,
+	"Hwy MPG":29,
+	"Weight":3055,
+	"Wheel Base":95,
+	"Len":158,
+	"Width":68
+	},
+	{
+	"Vehicle Name":"Acura NSX coupe 2dr manual S",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":89765,
+	"Dealer Cost":79978,
+	"Engine Size (l)":3.2,
+	"Cyl":6,
+	"HP":290,
+	"City MPG":17,
+	"Hwy MPG":24,
+	"Weight":3153,
+	"Wheel Base":100,
+	"Len":174,
+	"Width":71
+	}
+];
+</script>
+<script>
+//script for wrapping text
+function wrap(text, width) {
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}
+</script>
+
+
+
+<!-- =================================================================================== -->
+<!-- =================================================================================== -->
+<!-- =================================================================================== -->
+
+<h1>Comparison of Cars</h1>
+<br>
+<p>A comparison of 5 sports cars.</p>
+
+<!-- MPG bar chart ===================================================================== -->
+
+<br>
+<hr>
+<h2>Miles Per Gallon</h2>
+<br>
+
+<script>
+var data_to_display = [];
+data_to_display[0] = {};
+data_to_display[1] = {};
+data_to_display[0]["Field"] = "City MPG";
+data_to_display[1]["Field"] = "Hwy MPG";
+for (i = 0; i< data_from_json.length; i++) {
+	var vehiclename = data_from_json[i]["Vehicle Name"];
+	data_to_display[0][vehiclename] = data_from_json[i]["City MPG"]
+	data_to_display[1][vehiclename] = data_from_json[i]["Hwy MPG"]
+}
+var margin = {top: 20, right: 400, bottom: 30, left: 100},
+    width = 900 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+var x0 = d3.scale.ordinal()
+	.rangeRoundBands([0, width], .3);
+var x1 = d3.scale.ordinal();
+var y = d3.scale.linear()
+    .range([height, 0]);
+var color = d3.scale.ordinal()
+	.range(["#EEBA4C", "#E3493B", "#23B5AF", "#A9DDD9", "#3A3A3C"]);
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var objectNames = d3.keys(data_to_display[0]).filter(function(key) { return key !== "Field"; });
+data_to_display.forEach(function(d) {
+d.fields = objectNames.map(function(field) { return {field: field, value: +d[field]}; });
+});
+x0.domain(data_to_display.map(function(d) { return d.Field; }));
+x1.domain(objectNames).rangeRoundBands([0, x0.rangeBand()]);
+y.domain([0, d3.max(data_to_display, function(d) { return d3.max(d.fields, function(d) { return d.value; }); })]);
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Miles Per Gallon");
+  svg.append("text")      // text label for the x axis
+        .attr("x", 500 )
+        .attr("y", 450 )
+        .style("text-anchor", "middle")
+        .text("Attributes");
+  
+  var state = svg.selectAll(".field")
+      .data(data_to_display)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0(d.Field) + ",0)"; });
+  state.selectAll("rect")
+      .data(function(d) { return d.fields; })
+    .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.field); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .style("fill", function(d) { return color(d.field); });
+  var legend = svg.selectAll(".legend")
+      .data(objectNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(400," + i * 20 + ")"; });
+ //     .attr('transform', 'translate(10,270)');
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+</script>
+
+
+<!-- Horse Power bar chart ===================================================================== -->
+
+<br>
+<hr>
+<h2>Horse Power</h2>
+
+
+<script>
+var data_to_display = [];
+for (i = 0; i< data_from_json.length; i++) {
+	data_to_display[i] = {}
+	var vehiclename = data_from_json[i]["Vehicle Name"];
+	data_to_display[i]["Field"] = vehiclename;
+	data_to_display[i]["Horse Power"] = data_from_json[i]["HP"];
+}
+var margin = {top: 20, right: 40, bottom: 70, left: 40},
+    width = 1200 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+var x0 = d3.scale.ordinal()
+  .rangeRoundBands([0, width], .5);
+var x1 = d3.scale.ordinal();
+var y = d3.scale.linear()
+    .range([height, 0]);
+var color = d3.scale.ordinal()
+	.range(["orange"]);
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var objectNames = d3.keys(data_to_display[0]).filter(function(key) { return key !== "Field"; });
+data_to_display.forEach(function(d) {
+d.fields = objectNames.map(function(field) { return {field: field, value: +d[field]}; });
+});
+l_labels = data_to_display.map(function(d) { return d.Field   ; });
+l_labels_trunc = []
+for (var i=0; i<l_labels.length; i++) {
+  l_labels_trunc[i] = l_labels[i].slice(0,15);
+}
+x0.domain(l_labels);
+x1.domain(objectNames).rangeRoundBands([0, x0.rangeBand()]);
+y.domain([0, d3.max(data_to_display, function(d) { return d3.max(d.fields, function(d) { return d.value; }); })]);
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll(".tick text")
+      .call(wrap, x0.rangeBand());
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("horsepower");
+  var state = svg.selectAll(".field")
+      .data(data_to_display)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0(d.Field) + ",0)"; });
+  state.selectAll("rect")
+      .data(function(d) { return d.fields; })
+    .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.field); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .style("fill", function(d) { return color(d.field); });
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  var legend = svg.selectAll(".legend")
+      .data(objectNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+</script>
+
+
+<!-- Engine Size bar chart ===================================================================== -->
+
+<br>
+<hr>
+<h2>Engine Size</h2>
+<script>
+var data_to_display = [];
+for (i = 0; i< data_from_json.length; i++) {
+	data_to_display[i] = {}
+	var vehiclename = data_from_json[i]["Vehicle Name"];
+	data_to_display[i]["Field"] = vehiclename;
+	data_to_display[i]["Engine Size"] = data_from_json[i]["Engine Size (l)"];
+}
+var margin = {top: 20, right: 40, bottom: 70, left: 40},
+    width = 1200 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+var x0 = d3.scale.ordinal()
+  .rangeRoundBands([0, width], .5);
+var x1 = d3.scale.ordinal();
+var y = d3.scale.linear()
+    .range([height, 0]);
+var color = d3.scale.ordinal()
+  .range(["red"]);
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var objectNames = d3.keys(data_to_display[0]).filter(function(key) { return key !== "Field"; });
+data_to_display.forEach(function(d) {
+d.fields = objectNames.map(function(field) { return {field: field, value: +d[field]}; });
+});
+l_labels = data_to_display.map(function(d) { return d.Field   ; });
+l_labels_trunc = []
+for (var i=0; i<l_labels.length; i++) {
+  l_labels_trunc[i] = l_labels[i].slice(0,15);
+}
+x0.domain(l_labels);
+x1.domain(objectNames).rangeRoundBands([0, x0.rangeBand()]);
+y.domain([0, d3.max(data_to_display, function(d) { return d3.max(d.fields, function(d) { return d.value; }); })]);
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll(".tick text")
+      .call(wrap, x0.rangeBand());
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Engine Size");
+  var state = svg.selectAll(".field")
+      .data(data_to_display)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0(d.Field) + ",0)"; });
+  state.selectAll("rect")
+      .data(function(d) { return d.fields; })
+    .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.field); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .style("fill", function(d) { return color(d.field); });
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  var legend = svg.selectAll(".legend")
+      .data(objectNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+</script>
+
+
+
+
+
+<!-- Price bar chart ===================================================================== -->
+
+<br>
+<hr>
+<h2>Price (in $USD)</h2>
+<script>
+var data_to_display = [];
+for (i = 0; i< data_from_json.length; i++) {
+	data_to_display[i] = {}
+	var vehiclename = data_from_json[i]["Vehicle Name"];
+	data_to_display[i]["Field"] = vehiclename;
+	data_to_display[i]["Retail Price"] = data_from_json[i]["Retail Price"];
+}
+var margin = {top: 20, right: 40, bottom: 70, left: 40},
+    width = 1200 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+var x0 = d3.scale.ordinal()
+  .rangeRoundBands([0, width], .5);
+var x1 = d3.scale.ordinal();
+var y = d3.scale.linear()
+    .range([height, 0]);
+var color = d3.scale.ordinal()
+  .range(["blue"]);
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var objectNames = d3.keys(data_to_display[0]).filter(function(key) { return key !== "Field"; });
+data_to_display.forEach(function(d) {
+d.fields = objectNames.map(function(field) { return {field: field, value: +d[field]}; });
+});
+l_labels = data_to_display.map(function(d) { return d.Field   ; });
+l_labels_trunc = []
+for (var i=0; i<l_labels.length; i++) {
+  l_labels_trunc[i] = l_labels[i].slice(0,15);
+}
+x0.domain(l_labels);
+x1.domain(objectNames).rangeRoundBands([0, x0.rangeBand()]);
+y.domain([0, d3.max(data_to_display, function(d) { return d3.max(d.fields, function(d) { return d.value; }); })]);
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll(".tick text")
+      .call(wrap, x0.rangeBand());
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("horsepower");
+  var state = svg.selectAll(".field")
+      .data(data_to_display)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0(d.Field) + ",0)"; });
+  state.selectAll("rect")
+      .data(function(d) { return d.fields; })
+    .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.field); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .style("fill", function(d) { return color(d.field); });
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  var legend = svg.selectAll(".legend")
+      .data(objectNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+</script>
+
+
+</body>
+</html>

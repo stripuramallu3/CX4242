@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.tile {
+  shape-rendering: crispEdges;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+</style>
+<body>
+<script src="..//lib/d3.v3.min.js"></script>
+<script> 
+//Reference: 
+//http://bl.ocks.org/mbostock/3202354
+
+var margin = {top: 20, right: 90, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.linear().range([0, width]);
+var	y = d3.scale.linear().range([height, 0]); 
+var	z = d3.scale.linear().range(["white", 'steelblue']);
+
+var xStep = 1; 
+var yStep = 10; 
+
+var svg = d3.select("body").append("svg")
+			.attr("width", width + margin.left + margin.right)
+    		.attr("height", height + margin.top + margin.bottom)
+  			.append("g")
+    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
+
+d3.json("hourly_heatmap.json", function(error, data) {
+  if (error) throw error;
+  var buckets = [];
+    data.forEach(function(d) {
+      d.values.forEach(function(i, j) {
+        buckets.push({'date': j, 'bucket':+d.key, 'count':+i});  
+    }) 
+});
+
+x.domain(d3.extent(buckets, function(d) { return d["date"]; }));
+y.domain(d3.extent(buckets, function(d) { return d["bucket"]; }));
+z.domain([0, d3.max(buckets, function(d) { return d["count"]; })]);
+
+x.domain([x.domain()[0], x.domain()[1] + xStep]);
+y.domain([y.domain()[0], y.domain()[1] + yStep]);
+
+
+svg.selectAll(".tile")
+  .data(buckets)
+  .enter()
+  .append("rect")
+  .attr("class", "tile")
+  .attr("x", function(d) { return x(d["date"]); })
+  .attr("y", function(d) { return y(d["bucket"] + yStep); })
+  .attr("width", x(xStep) - x(0))
+  .attr("height",  y(0) - y(yStep))
+  .style("fill", function(d) { return z(d.count); });
+
+var legend = svg.selectAll(".legend")
+  .data(z.ticks(6).slice(1).reverse())
+  .enter().append("g")
+  .attr("class", "legend")
+  .attr("transform", function(d, i) { return "translate(" + (width + 20) + "," + (20 + i * 20) + ")"; });
+
+legend.append("rect")
+  .attr("width", 20)
+  .attr("height", 20)
+  .style("fill", z);
+
+legend.append("text")
+  .attr("x", 26)
+  .attr("y", 10)
+  .attr("dy", ".35em")
+  .text(String);
+
+svg.append("text")
+  .attr("class", "label")
+  .attr("x", width + 20)
+  .attr("y", 10)
+  .attr("dy", ".35em")
+  .text("Count");
+
+
+svg.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.svg.axis().scale(x).orient("bottom"))
+  .append("text")
+  .attr("class", "label")
+  .attr("x", width)
+  .attr("y", -6)
+  .attr("text-anchor", "end")
+  .text("Hours");
+
+
+svg.append("g")
+  .attr("class", "y axis")
+  .call(d3.svg.axis().scale(y).orient("left"))
+  .append("text")
+  .attr("class", "label")
+  .attr("y", 6)
+  .attr("dy", ".71em")
+  .attr("text-anchor", "end")
+  .attr("transform", "rotate(-90)")
+  .text("ID");
+}); 
+</script>

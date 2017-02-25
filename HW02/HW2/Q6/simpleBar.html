@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.chart rect {
+  fill: "steelblue"
+}
+
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+text {
+    font: 10px sans-serif;
+    color: white;
+}
+
+</style>
+<svg class="body"></svg>
+    <script src="../lib/d3.v3.min.js"></script>
+<script>
+
+    var data = [{product:'Product A',freq:{Q1:716, Q2:1287, Q3:249, Q4:324}}
+    ,{product:'Product B',freq:{Q1:2000, Q2:1876, Q3:3009, Q4:973}}
+    ,{product:'Product C',freq:{Q1:899, Q2:2333, Q3:418, Q4:213}}
+    ,{product:'Product D',freq:{Q1:989, Q2:1543, Q3:1862, Q4: 1111}}
+    ,{product:'Product E',freq:{Q1:4200, Q2:3220, Q3:948, Q4: 629}}
+    ,{product:'Product F',freq:{Q1:1321, Q2:156, Q3:212, Q4: 821}}
+    ,{product:'Product G',freq:{Q1:1977, Q2:247, Q3:1203, Q4: 562}}
+    ,{product:'Product H',freq:{Q1:2498, Q2:2852, Q3:942, Q4: 444}}]; 
+
+ var axisMargin = 20,
+            margin = 90,
+            width = 1024,
+            height = 500,
+            barHeight = (height-axisMargin-margin*2)* 0.4/data.length,
+            barPadding = (height-axisMargin-margin*2)*0.6/data.length,
+            data, bar, svg, scale = 0;
+
+var x = d3.scale.linear().domain([0, d3.max(data, function(d) {return d.freq.Q1 + d.freq.Q2 + d.freq.Q3 + d.freq.Q4;} )]).range([0, width - margin*5]);
+
+svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height); 
+
+bar = svg.selectAll("g")
+         .data(data)
+         .enter().append("g")
+
+bar.attr("class", "bar")
+        .attr("cx",0)
+        .attr("transform", function(d, i) {
+            return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
+        });
+
+bar.append("text")
+   .attr("class", "product")
+   .attr("y", barHeight/2)
+   .attr("dy", ".35em") //vertical align middle
+            .text(function(d){
+                return d.product;
+            }); 
+
+bar.append("rect")
+        .style("fill", "grey")
+        .attr("transform", "translate("+ 50 +", 0)")
+        .attr("height", barHeight)
+        .attr("width", function(d){
+            return x(d.freq.Q1 + d.freq.Q2 + d.freq.Q3 + d.freq.Q4);
+        });
+
+bar.append("text")  
+    .style("fill", "white")
+    .attr("x", function(d) {
+                return x(d.freq.Q1 + d.freq.Q2 + d.freq.Q3 + d.freq.Q4); 
+            }) 
+    .attr("y", barHeight/2)
+    .attr("dy", ".35em")
+    .text(function(d) { return "$" + (d.freq.Q1 + d.freq.Q2 + d.freq.Q3 + d.freq.Q4); });
+
+var defaultQ1, defaultQ2, defaultQ3, defaultQ4 = 0; 
+var sum = 0; 
+for (var i = 0; i < data.length; i++) {
+  sum += data[i].freq.Q1 + data[i].freq.Q2 + data[i].freq.Q3 + data[i].freq.Q4; 
+  defaultQ1 += data[i].freq.Q1;
+  defaultQ2 += data[i].freq.Q2;  
+  defaultQ3 += data[i].freq.Q3;
+  defaultQ4 += data[i].freq.Q4;
+}
+
+var defaultData = [{Q1: defaultQ1, Q2: defaultQ2, Q3: defaultQ3, Q4: defaultQ4}]; 
+
+var legend = svg.selectAll(".legend")
+  .data(defaultData)
+  .enter().append("g")
+  .attr("class", "legend")
+  .attr("transform", function(d, i) { return "translate(" + (100) + "," + (20 + i * 20) + ")"; });
+legend.append("text")
+      .attr("x", width - 350)
+      .attr("y", 0)
+      .attr("dy", ".35em")
+      .text();
+
+</script>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>SANKEY Experiment</title>
+<style>
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+
+.link:hover {
+  stroke-opacity: .5;
+}
+
+</style>
+<body>
+
+<p id="chart">
+
+<script src="..//lib/d3.v3.min.js"></script>
+<script src="..//lib/sankey.js"></script>
+<script>
+d3.csv("races.csv", function(error, data1) {
+  d3.csv("teams.csv", function(error, data2) {
+    console.log(data2); 
+    console.log(data1);  
+  })
+}); 
+  </script>

@@ -1,0 +1,1 @@
+I scaled the radii linearly because it was the most visually appealing for the range bound I implemented. The square root scaling made everything small, and it was difficult to see the difference in node sizes. 

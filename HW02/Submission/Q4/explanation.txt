@@ -1,0 +1,2 @@
+The hourly heatmap indidcates that there are more instances of higher glucose levels in the morning. 
+The daily heatmap indicates that there are more instances of lower glucose levels at the end of the week. 

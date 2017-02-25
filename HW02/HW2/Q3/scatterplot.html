@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="../lib/d3.v3.min.js"></script>
+<body>
+<script>
+var margin = {top: 50, right: 30, bottom: 50, left: 40},
+    width = 1024 - margin.left - margin.right,
+    height = 500 * 5 - margin.top - margin.bottom;
+
+var sepalLength = d3.scale.linear().range([0, width]);
+var sepalWidth = d3.scale.linear().range([height / 5, 0]);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height / 5 + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("text")
+    .attr("x", (width / 2))
+    .attr("y", 0 - (margin.top / 2))
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .text("Sepal Length (cm) vs. Sepal Width (cm)");
+
+var petalLength = d3.scale.linear().range([0, width]);
+var petalWidth = d3.scale.linear().range([height / 5, 0]);
+
+var svgPetal = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height / 5 + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
+
+svgPetal.append("text")
+    .attr("x", (width / 2))
+    .attr("y", 0 - (margin.top / 2))
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .text("Petal Length (cm) vs. Petal Width (cm)");
+
+var svgSymbolScaling = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height / 5 + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
+
+svgSymbolScaling.append("text")
+    .attr("x", (width / 2))
+    .attr("y", 0 - (margin.top / 2))
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .text("Sepal Length (cm) vs. Sepal Width (cm) (Symbol Size Scaled By Length)");
+
+var sepalLengthSqrt = d3.scale.sqrt().range([0, width]);
+var sepalWidthSqrt = d3.scale.sqrt().range([height / 5, 0]);
+
+var svgSquareRoot = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height / 5 + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
+
+svgSquareRoot.append("text")
+    .attr("x", (width / 2))
+    .attr("y", 0 - (margin.top / 2))
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .text("Sepal Length (cm) vs. Sepal Width (cm) (Square Root Scaling)");
+
+var sepalLengthLog = d3.scale.log().range([0, width]);
+var sepalWidthLog = d3.scale.log().range([height / 5, 0]);
+
+var svgLog = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height / 5 + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
+
+svgLog.append("text")
+    .attr("x", (width / 2))
+    .attr("y", 0 - (margin.top / 2))
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .text("Sepal Length (cm) vs. Sepal Width (cm) (Log Scaling)");
+
+d3.tsv("iris.tsv", function(error, data) {
+  if (error) throw error;
+  sepalLength.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+  sepalWidth.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
+  petalLength.domain(d3.extent(data, function(d) { return d.petalLength; })).nice();
+  petalWidth.domain(d3.extent(data, function(d) { return d.petalWidth; })).nice();
+  sepalLengthSqrt.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+  sepalWidthSqrt.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
+  sepalLengthLog.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+  sepalWidthLog.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height / 5 + ")")
+      .call(d3.svg.axis().scale(sepalLength).orient("bottom"))
+      .append("text")
+      .attr("transform", "translate(" + (width - 90) + ", 0)")
+      .text("Sepal Length (cm)");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(d3.svg.axis().scale(sepalWidth).orient("left"))
+      .append("text")
+      .attr("transform", "translate(0, 0)")
+      .text("Sepal Width (cm)");
+ 
+  svg.selectAll(".point")
+      .data(data)
+    .enter().append("path")
+      .attr("class", "point")
+      .attr("d", d3.svg.symbol().type(function(d) {
+          if (d["species"] == "setosa") {
+              return "circle";
+          } else if (d["species"] == "versicolor") {
+              return "square";
+          } else {
+              return "triangle-up";
+          }
+      }))
+      .attr("stroke", function(d) {
+          if (d["species"] == "setosa") {
+              return "red";
+          } else if (d["species"] == "versicolor") {
+              return "blue";
+          } else {
+              return "green";
+          }
+      })
+      .attr("fill", "white")
+      .attr("transform", function(d) { return "translate(" + sepalLength(d.sepalLength) + "," + sepalWidth(d.sepalWidth) + ")"; });
+
+  svg.append("path")
+    .attr("class", "point1")
+    .attr("d", d3.svg.symbol().type("square"))
+    .attr("stroke", "blue")
+    .attr("fill", "white")
+    .attr("transform", "translate(" + (width + 10) + ", -30)");
+  svg.append("path")
+      .attr("class", "point2")
+      .attr("d", d3.svg.symbol().type("circle"))
+      .attr("stroke", "red")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 0)");
+  svg.append("path")
+      .attr("class", "point3")
+      .attr("d", d3.svg.symbol().type("triangle-up"))
+      .attr("stroke", "green")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 30)");
+	svg.append("text")
+		.attr("x", width - 5)
+		.attr("y", -30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("versicolor")
+	svg.append("text")
+		.attr("x", width - 5)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("setosa");
+	svg.append("text")
+		.attr("x", width - 5)
+		.attr("y", 30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("virginica");
+
+  svgPetal.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height / 5 + ")")
+      .call(d3.svg.axis().scale(petalLength).orient("bottom"))
+      .append("text")
+      .attr("transform", "translate(" + (width - 90) + ", 0)")
+      .text("Petal Length (cm)");
+
+  svgPetal.append("g")
+      .attr("class", "y axis")
+      .call(d3.svg.axis().scale(petalWidth).orient("left"))
+      .append("text")
+      .attr("transform", "translate(0, 0)")
+      .text("Petal Width (cm)");
+
+  svgPetal.selectAll(".point")
+      .data(data)
+      .enter().append("path")
+      .attr("class", "point")
+      .attr("d", d3.svg.symbol().type(function(d) {
+          if (d["species"] == "setosa") {
+              return "circle";
+          } else if (d["species"] == "versicolor") {
+              return "square";
+          } else {
+              return "triangle-up";
+          }
+      }))
+      .attr("stroke", function(d) {
+          if (d["species"] == "setosa") {
+              return "red";
+          } else if (d["species"] == "versicolor") {
+              return "blue";
+          } else {
+              return "green";
+          }
+      })
+      .attr("fill", "white")
+      .attr("transform", function(d) { return "translate(" + petalLength(d.petalLength) + "," + petalWidth(d.petalWidth) + ")"; });
+  svgPetal.append("path")
+    .attr("class", "point1")
+    .attr("d", d3.svg.symbol().type("square"))
+    .attr("stroke", "blue")
+    .attr("fill", "white")
+    .attr("transform", "translate(" + (width + 10) + ", -30)");
+  svgPetal.append("path")
+      .attr("class", "point2")
+      .attr("d", d3.svg.symbol().type("circle"))
+      .attr("stroke", "red")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 0)");
+  svgPetal.append("path")
+      .attr("class", "point3")
+      .attr("d", d3.svg.symbol().type("triangle-up"))
+      .attr("stroke", "green")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 30)");
+	svgPetal.append("text")
+		.attr("x", width - 5)
+		.attr("y", -30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("versicolor")
+	svgPetal.append("text")
+		.attr("x", width - 5)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("setosa");
+	svgPetal.append("text")
+		.attr("x", width - 5)
+		.attr("y", 30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("virginica");
+
+  svgSymbolScaling.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height / 5 + ")")
+      .call(d3.svg.axis().scale(sepalLength).orient("bottom"))
+      .append("text")
+      .attr("transform", "translate(" + (width - 90) + ", 0)")
+      .text("Sepal Length (cm)");
+
+  svgSymbolScaling.append("g")
+      .attr("class", "y axis")
+      .call(d3.svg.axis().scale(sepalWidth).orient("left"))
+      .append("text")
+      .attr("transform", "translate(0, 0)")
+      .text("Sepal Width (cm)");
+
+  svgSymbolScaling.selectAll(".point")
+      .data(data)
+      .enter().append("path")
+      .attr("class", "point")
+      .attr("d", d3.svg.symbol().type(function(d) {
+          if (d["species"] == "setosa") {
+              return "circle";
+          } else if (d["species"] == "versicolor") {
+              return "square";
+          } else {
+              return "triangle-up";
+          }
+      }).size(function(d) {
+          return Math.pow(d.sepalLength, 2);
+      }))
+      .attr("stroke", function(d) {
+          if (d["species"] == "setosa") {
+              return "red";
+          } else if (d["species"] == "versicolor") {
+              return "blue";
+          } else {
+              return "green";
+          }
+      })
+      .attr("fill", "white")
+      .attr("transform", function(d) { return "translate(" + sepalLength(d.sepalLength) + "," + sepalWidth(d.sepalWidth) + ")"; });
+  svgSymbolScaling.append("path")
+    .attr("class", "point1")
+    .attr("d", d3.svg.symbol().type("square"))
+    .attr("stroke", "blue")
+    .attr("fill", "white")
+    .attr("transform", "translate(" + (width + 10) + ", -30)");
+  svgSymbolScaling.append("path")
+      .attr("class", "point2")
+      .attr("d", d3.svg.symbol().type("circle"))
+      .attr("stroke", "red")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 0)");
+  svgSymbolScaling.append("path")
+      .attr("class", "point3")
+      .attr("d", d3.svg.symbol().type("triangle-up"))
+      .attr("stroke", "green")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 30)");
+	svgSymbolScaling.append("text")
+		.attr("x", width - 5)
+		.attr("y", -30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("versicolor")
+	svgSymbolScaling.append("text")
+		.attr("x", width - 5)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("setosa");
+	svgSymbolScaling.append("text")
+		.attr("x", width - 5)
+		.attr("y", 30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("virginica");
+
+  svgSquareRoot.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height / 5 + ")")
+      .call(d3.svg.axis().scale(sepalLengthSqrt).orient("bottom"))
+      .append("text")
+      .attr("transform", "translate(" + (width - 90) + ", 0)")
+      .text("Sepal Length (cm)");
+  
+  svgSquareRoot.append("g")
+      .attr("class", "y axis")
+      .call(d3.svg.axis().scale(sepalWidthSqrt).orient("left"))
+      .append("text")
+      .attr("transform", "translate(0, 0)")
+      .text("Sepal Width (cm)");
+  
+  svgSquareRoot.selectAll(".point")
+      .data(data)
+      .enter().append("path")
+      .attr("class", "point")
+      .attr("d", d3.svg.symbol().type(function(d) {
+          if (d["species"] == "setosa") {
+              return "circle";
+          } else if (d["species"] == "versicolor") {
+              return "square";
+          } else {
+              return "triangle-up";
+          }
+      }))
+      .attr("stroke", function(d) {
+          if (d["species"] == "setosa") {
+              return "red";
+          } else if (d["species"] == "versicolor") {
+              return "blue";
+          } else {
+              return "green";
+          }
+      })
+      .attr("fill", "white")
+      .attr("transform", function(d) { return "translate(" + sepalLengthSqrt(d.sepalLength) + "," + sepalWidthSqrt(d.sepalWidth) + ")"; });
+  svgSquareRoot.append("path")
+    .attr("class", "point1")
+    .attr("d", d3.svg.symbol().type("square"))
+    .attr("stroke", "blue")
+    .attr("fill", "white")
+    .attr("transform", "translate(" + (width + 10) + ", -30)");
+  svgSquareRoot.append("path")
+      .attr("class", "point2")
+      .attr("d", d3.svg.symbol().type("circle"))
+      .attr("stroke", "red")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 0)");
+  svgSquareRoot.append("path")
+      .attr("class", "point3")
+      .attr("d", d3.svg.symbol().type("triangle-up"))
+      .attr("stroke", "green")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 30)");
+	svgSquareRoot.append("text")
+		.attr("x", width - 5)
+		.attr("y", -30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("versicolor")
+	svgSquareRoot.append("text")
+		.attr("x", width - 5)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("setosa");
+	svgSquareRoot.append("text")
+		.attr("x", width - 5)
+		.attr("y", 30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("virginica");
+  
+  svgLog.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height / 5 + ")")
+      .call(d3.svg.axis().scale(sepalLengthLog).orient("bottom"))
+      .append("text")
+      .attr("transform", "translate(" + (width - 90) + ", 0)")
+      .text("Sepal Length (cm)");
+
+  svgLog.append("g")
+      .attr("class", "y axis")
+      .call(d3.svg.axis().scale(sepalWidthLog).orient("left"))
+      .append("text")
+      .attr("transform", "translate(0, 0)")
+      .text("Sepal Width (cm)");
+
+  svgLog.selectAll(".point")
+      .data(data)
+      .enter().append("path")
+      .attr("class", "point")
+      .attr("d", d3.svg.symbol().type(function(d) {
+          if (d["species"] == "setosa") {
+              return "circle";
+          } else if (d["species"] == "versicolor") {
+              return "square";
+          } else {
+              return "triangle-up";
+          }
+      }))
+      .attr("stroke", function(d) {
+          if (d["species"] == "setosa") {
+              return "red";
+          } else if (d["species"] == "versicolor") {
+              return "blue";
+          } else {
+              return "green";
+          }
+      })
+      .attr("fill", "white")
+      .attr("transform", function(d) { return "translate(" + sepalLengthLog(d.sepalLength) + "," + sepalWidthLog(d.sepalWidth) + ")"; });
+  svgLog.append("path")
+    .attr("class", "point1")
+    .attr("d", d3.svg.symbol().type("square"))
+    .attr("stroke", "blue")
+    .attr("fill", "white")
+    .attr("transform", "translate(" + (width + 10) + ", -30)");
+  svgLog.append("path")
+      .attr("class", "point2")
+      .attr("d", d3.svg.symbol().type("circle"))
+      .attr("stroke", "red")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 0)");
+  svgLog.append("path")
+      .attr("class", "point3")
+      .attr("d", d3.svg.symbol().type("triangle-up"))
+      .attr("stroke", "green")
+      .attr("fill", "white")
+      .attr("transform", "translate(" + (width + 10) + ", 30)");
+	svgLog.append("text")
+		.attr("x", width - 5)
+		.attr("y", -30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("versicolor")
+	svgLog.append("text")
+		.attr("x", width - 5)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("setosa");
+	svgLog.append("text")
+		.attr("x", width - 5)
+		.attr("y", 30)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text("virginica");
+});
+</script>
+</body>
+</html>
