@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="d3/d3.v3.js"></script>
+        <style>
+            div.bar {
+                display: inline-block;
+                width: 30px;
+                height: 75px;
+                background-color: teal;
+                margin-right: 2px;
+                border-color: 1px black solid; 
+            }
+        </style>
+    </head>
+    <body>
+        <center><p>Sreeramamurthy Tripuramallu</p></center>
+        <script type="text/javascript">
+            var dataset = [];
+            for (var i = 0; i < 25; i++) {
+                var newNumber = Math.random() * 30; 
+                dataset.push(newNumber); 
+            }
+            var letters = '0123456789ABCDEF'; 
+            var colorSet = []; 
+            var color = '#'; 
+            count = 0;
+            for (var i = 0; i < 5; i++) {
+                for (var j = 0; j < 6; j++) {
+                    color += letters[Math.floor(Math.random() * 16)]; 
+                } 
+                colorSet.push(color);
+                color = "#"; 
+            }
+            var temp =  d3.select("body").selectAll("div")
+                .data(dataset)
+                .enter()
+                .append("div")
+                .attr("class", "bar")
+                .style("height", function(d) {
+                    var barHeight = d * 5;  
+                    return barHeight + "px";
+                })
+                .style("background-color", function(d) {
+                    return colorSet[Math.floor(count++/5)];
+                }); 
+            
+        </script>
+    </body>
+</html>

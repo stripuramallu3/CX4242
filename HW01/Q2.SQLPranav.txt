@@ -1,0 +1,35 @@
+.separator "%"
+
+create table movies(movie_id integer, name text, genre text);
+.import movies.txt movies
+
+create table ratings (user_id integer, movie_id integer, rating real, timestamp integer);
+.import ratings.txt ratings
+
+create index movies_primary_index on movies (movie_id);
+create index movies_secondary_index on ratings (movie_id);
+.separator ", "
+
+select count(*) from (select count(distinct movie_id) from movies inner join ratings using(movie_id) group by movie_id having avg(rating) >= 3.5 and count(user_id) >= 500);
+select null;
+
+select movie_id, name, count(user_id) from movies inner join ratings using(movie_id) group by movie_id having count(user_id) >= 2500 order by count(user_id) desc, name;
+select null;
+
+select movie_id, name, avg(rating) from movies inner join ratings using(movie_id) group by movie_id order by avg(rating) desc, name limit 10;
+select null;
+
+select name, avg(rating), count(user_id), genre from movies inner join ratings using(movie_id) group by movie_id having count(user_id) >= 1000 order by avg(rating) desc, name, genre limit 8;
+select null;
+
+create view common_interests as select b.user_id, c.user_id, name from (select movie_id from ratings group by movie_id having count(rating) = 10) a inner join movies on movies.movie_id = a.movie_id inner join ratings b on a.movie_id = b.movie_id inner join ratings c on c.movie_id = a.movie_id where b.user_id < c.user_id order by b.user_id, c.user_id;
+
+select count(*) from common_interests;
+select null;
+
+select count(*) from (select overview from movie_overview where overview match 'life OR death');
+select null; 
+
+select id from movie_overview where overview match 'life NEAR/6 about';
+select null; 
+.separator ", "

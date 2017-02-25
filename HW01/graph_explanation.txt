@@ -1,0 +1,2 @@
+The min node size is 6, and the max is 11. Node size is used to indicate out-degree size.
+The color of the nodes indicates degree size. The spacing of the graph is set to isolate different groups. Node labels are not used because it adds to much visual complexity.

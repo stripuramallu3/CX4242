@@ -1,0 +1,7 @@
+Average node degree: 2.074
+Diameter of the graph: 4
+Average path length: 3.617
+
+
+The degree represents the number of nodes pointing either in or out of
+any node, the average is average of all of the nodes. The path length is the number of edges between two nodes. Thus, the average is the average among all of the nodes. Lastly, the diameter is the maximum path length in the graph.

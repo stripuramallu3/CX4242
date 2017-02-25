@@ -1,0 +1,9 @@
+i) I decided to use key collision over nearest neighbour because nearest neighbor grouped 14th/15th/16/17th/18th Annual Dinner as the same event, under a single label, when infact they are the different events. Also, key collision does a better job of catching similarities, for example, it will cluster that Dinner and &Dinner& together. 
+
+
+ii) n-gram fingerprint essentially groups events that are contain the same letters, regardless of the ordering of the charaters. 
+
+iii) Column with nominal data: Event 
+	 Column with ordinal data: Dish Count
+
+iv) It is possible to use the Scatterplot facet feature to organize menu orders by date, to see which days have more events. Knowing this infomration, the company can organize its staff to have more people on busier days and fewer people on idle days. 

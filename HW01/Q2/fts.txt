@@ -1,0 +1,1 @@
+FTS performance is a lot faster than the SQL "like" query because the "like" query will do a full scan of the table whereas FTS will use the index to look for records. 
